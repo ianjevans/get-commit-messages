@@ -19,41 +19,22 @@
  * Imports
  */
 import * as core from '@actions/core'
-import * as inputHelper from './input-helper'
-import * as commitMessageChecker from './commit-message-checker'
 
 /**
  * Main function
  */
 async function run(): Promise<void> {
   try {
-    const onePassAllPass = core.getInput('one_pass_all_pass')
     const commitsString = core.getInput('commits')
     const commits = JSON.parse(commitsString)
-    const checkerArguments = inputHelper.getInputs()
 
-    const preErrorMsg = core.getInput('pre_error')
-    const postErrorMsg = core.getInput('post_error')
-
-    const failed = []
+    let commitMessages: string = "";
 
     for (const {commit, sha} of commits) {
-      inputHelper.checkArgs(checkerArguments)
-      let errMsg = commitMessageChecker.checkCommitMessages(checkerArguments, commit.message)
-
-      if (errMsg) {
-        failed.push({sha, message: errMsg})
-      }
+      commitMessages.concat(commit.message);
     }
 
-    if (onePassAllPass === 'true' && commits.length > failed.length) {
-      return
-    }
-
-    if (failed.length > 0) {
-      const summary = inputHelper.genOutput(failed, preErrorMsg, postErrorMsg)
-      core.setFailed(summary)
-    }
+    core.setOutput("commit-messsages", commitMessages);
 
   } catch (error) {
     core.error(error)

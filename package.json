@@ -1,22 +1,21 @@
 {
-  "name": "commit-message-checker",
-  "version": "0.3.0",
-  "description": "GitHub Action that checks commit messages of pushes and pull request against a regex pattern",
+  "name": "get-commit-messages",
+  "version": "0.1.0",
+  "description": "GitHub Action that returns commit messages of pull requests",
   "keywords": [
     "github",
     "actions",
     "commit",
     "message",
     "pull",
-    "request",
-    "push"
+    "request"
   ],
-  "homepage": "https://github.com/tim-actions/commit-message-checker-with-regex",
+  "homepage": "https://github.com/ianjevans/get-commit-messages",
   "bugs": {
-    "url": "https://github.com/tim-actions/commit-message-checker-with-regex/issues"
+    "url": "https://github.com/ianjevans/get-commit-messages/issues"
   },
   "license": "MIT",
-  "author": "Simon Gilli <ghactions@gilbertsoft.org> (https://gilbertsoft.org)",
+  "author": "Ian Evans <ian@cockroachlabs.com> (https://cockroachlabs.com)",
   "files": [
     "action.yml",
     "dist",
@@ -25,7 +24,7 @@
   "main": "lib/main.js",
   "repository": {
     "type": "git",
-    "url": "https://github.com/GsActions/commit-message-checker.git"
+    "url": "https://github.com/ianjevans/get-commit-messages.git"
   },
   "scripts": {
     "build": "tsc",
