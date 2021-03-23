@@ -1,25 +1,16 @@
-# Commit Messages (in Pull Request) Checker with regex
+# Get commit messages from a pull request
 
 ![Version](https://img.shields.io/github/v/release/gsactions/commit-message-checker?style=flat-square)
 ![Test](https://github.com/gsactions/commit-message-checker/workflows/build-test/badge.svg)
 
-A GitHub action that checks that commit messages match a regex pattern. The
-action is able to act on pull request and push events and check the pull
-request title and body or the commit message of the commits of a push.
+A GitHub action that returns commit messages from a pull request.
 
 On pull requests the title and body are concatenated delimited by two line
 breaks.
 
-Designed to be very flexible in usage: you can split checks into various
-workflows, using action types on pull request to listen on, define branches
-for pushes etc. etc.
-
 ## Configuration
 
-More information about `pattern` and `flags` can be found in the
-[JavaScript reference](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
-
-`flags` is optional and defaults to `gm`.
+`commits` are the JSON encoded commits from a pull request. Use the `tim-actions/get-pr-commits` action to get these commits.
 
 ### Example Workflow
 
@@ -44,39 +35,16 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Check Subject Line Length
-        uses: tim-actions/commit-message-checker-with-regex@v1.0.0
+      - name: Get commit messages
+        id: 'get-pr-commit-messages'
+        uses: ianjevans/get-commit-messages@master
         with:
           commits: ${{ steps.get-pr-commits.outputs.commits }}
-          pattern: '^.{0,75}(\n.*)*$'
-          error: 'Subject too long (max 75)'
 
-      - name: Check Body Line Length
-        if: ${{ success() || failure() }}
-        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
-        with:
-          commits: ${{ steps.get-pr-commits.outputs.commits }}
-          pattern: '^.+(\n.{0,72})*$'
-          error: 'Body line too long (max 72)'
-
-      - name: Check Fixes
-        if: ${{ success() || failure() }}
-        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
-        with:
-          commits: ${{ steps.get-pr-commits.outputs.commits }}
-          pattern: '\s*Fixes\s*:?\s*(#\d+|github\.com\/kata-containers\/[a-z-.]*#\d+)'
-          error: 'No "Fixes" found'
-          one_pass_all_pass: 'true'
-
-      - name: Check subsystem
-        if: ${{ success() || failure() }}
-        uses: tim-actions/commit-message-checker-with-regex@v0.3.1
-        with:
-          commits: ${{ steps.get-pr-commits.outputs.commits }}
-          pattern: '^[\h]*([^:\h\n]+)[\h]*:'
-          error: 'Failed to find subsystem in subject'
-
-
+      - name: Output commit messages
+        run: |
+          echo "Commit messages"
+          echo "${{ steps.get-pr-commit-messages.outputs }}"
 ```
 
 ## Development
