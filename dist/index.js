@@ -104,35 +104,19 @@ Object.defineProperty(exports, "__esModule", { value: true });
  * Imports
  */
 const core = __importStar(__webpack_require__(470));
-const inputHelper = __importStar(__webpack_require__(821));
-const commitMessageChecker = __importStar(__webpack_require__(413));
 /**
  * Main function
  */
 function run() {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            const onePassAllPass = core.getInput('one_pass_all_pass');
             const commitsString = core.getInput('commits');
             const commits = JSON.parse(commitsString);
-            const checkerArguments = inputHelper.getInputs();
-            const preErrorMsg = core.getInput('pre_error');
-            const postErrorMsg = core.getInput('post_error');
-            const failed = [];
+            let commitMessages = '';
             for (const { commit, sha } of commits) {
-                inputHelper.checkArgs(checkerArguments);
-                let errMsg = commitMessageChecker.checkCommitMessages(checkerArguments, commit.message);
-                if (errMsg) {
-                    failed.push({ sha, message: errMsg });
-                }
+                commitMessages.concat(commit.message);
             }
-            if (onePassAllPass === 'true' && commits.length > failed.length) {
-                return;
-            }
-            if (failed.length > 0) {
-                const summary = inputHelper.genOutput(failed, preErrorMsg, postErrorMsg);
-                core.setFailed(summary);
-            }
+            core.setOutput('commit-messsages', commitMessages);
         }
         catch (error) {
             core.error(error);
@@ -144,60 +128,6 @@ function run() {
  * Main entry point
  */
 run();
-
-
-/***/ }),
-
-/***/ 413:
-/***/ (function(__unusedmodule, exports) {
-
-"use strict";
-
-/*
- * This file is part of the "GS Commit Message Checker" Action for Github.
- *
- * Copyright (C) 2019 by Gilbertsoft LLC (gilbertsoft.org)
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * For the full license information, please read the LICENSE file that
- * was distributed with this source code.
- */
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkMessage = exports.checkCommitMessages = void 0;
-/**
- * Checks commit messages given by args.
- *
- * @param     args messages, pattern and error message to process.
- * @returns   void
- */
-function checkCommitMessages(args, message) {
-    if (checkMessage(message, args.pattern, args.flags)) {
-        return '';
-    }
-    else {
-        return args.error;
-    }
-}
-exports.checkCommitMessages = checkCommitMessages;
-/**
- * Checks the message against the regex pattern.
- *
- * @param     message message to check against the pattern.
- * @param     pattern regex pattern for the check.
- * @returns   boolean
- */
-function checkMessage(message, pattern, flags) {
-    const regex = new RegExp(pattern, flags);
-    return regex.test(message);
-}
-exports.checkMessage = checkMessage;
 
 
 /***/ }),
@@ -534,97 +464,6 @@ exports.getState = getState;
 /***/ (function(module) {
 
 module.exports = require("path");
-
-/***/ }),
-
-/***/ 821:
-/***/ (function(__unusedmodule, exports, __webpack_require__) {
-
-"use strict";
-
-/*
- * This file is part of the "GS Commit Message Checker" Action for Github.
- *
- * Copyright (C) 2019 by Gilbertsoft LLC (gilbertsoft.org)
- *
- * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
- * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
- * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
- * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
- * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
- * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
- * THE SOFTWARE.
- *
- * For the full license information, please read the LICENSE file that
- * was distributed with this source code.
- */
-var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    Object.defineProperty(o, k2, { enumerable: true, get: function() { return m[k]; } });
-}) : (function(o, m, k, k2) {
-    if (k2 === undefined) k2 = k;
-    o[k2] = m[k];
-}));
-var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (function(o, v) {
-    Object.defineProperty(o, "default", { enumerable: true, value: v });
-}) : function(o, v) {
-    o["default"] = v;
-});
-var __importStar = (this && this.__importStar) || function (mod) {
-    if (mod && mod.__esModule) return mod;
-    var result = {};
-    if (mod != null) for (var k in mod) if (k !== "default" && Object.hasOwnProperty.call(mod, k)) __createBinding(result, mod, k);
-    __setModuleDefault(result, mod);
-    return result;
-};
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.genOutput = exports.checkArgs = exports.getInputs = void 0;
-/**
- * Imports
- */
-const core = __importStar(__webpack_require__(470));
-/**
- * Gets the inputs set by the user and the messages of the event.
- *
- * @returns   ICheckerArguments
- */
-function getInputs() {
-    const result = {};
-    // Get pattern
-    result.pattern = core.getInput('pattern', { required: true });
-    // Get flags
-    result.flags = core.getInput('flags');
-    // Get error message
-    result.error = core.getInput('error', { required: true });
-    return result;
-}
-exports.getInputs = getInputs;
-function checkArgs(args) {
-    // Check arguments
-    if (args.pattern.length === 0) {
-        throw new Error(`PATTERN not defined.`);
-    }
-    const regex = new RegExp('[^gimsuy]', 'g');
-    let invalidChars;
-    let chars = '';
-    while ((invalidChars = regex.exec(args.flags)) !== null) {
-        chars += invalidChars[0];
-    }
-    if (chars !== '') {
-        throw new Error(`FLAGS contains invalid characters "${chars}".`);
-    }
-    if (args.error.length === 0) {
-        throw new Error(`ERROR not defined.`);
-    }
-}
-exports.checkArgs = checkArgs;
-function genOutput(commitInfos, preErrorMsg, postErrorMsg) {
-    const lines = commitInfos.map(function (info) { return `  ${info.sha}    ${info.message}`; });
-    const errors = `${lines.join('\n')}`;
-    return preErrorMsg + '\n\n' + errors + '\n\n' + postErrorMsg;
-}
-exports.genOutput = genOutput;
-
 
 /***/ })
 

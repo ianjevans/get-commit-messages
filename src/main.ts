@@ -1,7 +1,7 @@
 /*
- * This file is part of the "GS Commit Message Checker" Action for Github.
+ * This file is part of the "get commit messages" Action for Github.
  *
- * Copyright (C) 2019 by Gilbertsoft LLC (gilbertsoft.org)
+ * Copyright (C) 2019 by Gilbertsoft LLC (gilbertsoft.org), Ian Evans
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -28,14 +28,13 @@ async function run(): Promise<void> {
     const commitsString = core.getInput('commits')
     const commits = JSON.parse(commitsString)
 
-    let commitMessages: string = "";
+    let commitMessages: string = ''
 
     for (const {commit, sha} of commits) {
-      commitMessages.concat(commit.message);
+      commitMessages.concat(commit.message)
     }
 
-    core.setOutput("commit-messsages", commitMessages);
-
+    core.setOutput('commit-messsages', commitMessages)
   } catch (error) {
     core.error(error)
     core.setFailed(error.message)

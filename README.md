@@ -1,7 +1,7 @@
 # Get commit messages from a pull request
 
-![Version](https://img.shields.io/github/v/release/gsactions/commit-message-checker?style=flat-square)
-![Test](https://github.com/gsactions/commit-message-checker/workflows/build-test/badge.svg)
+![Version](https://img.shields.io/github/v/release/gsactions/get-commit-messages?style=flat-square)
+![Test](https://github.com/gsactions/get-commit-messages/workflows/build-test/badge.svg)
 
 A GitHub action that returns commit messages from a pull request.
 
@@ -20,9 +20,6 @@ on:
   pull_request:
     types:
       - opened
-      - edited
-      - reopened
-      - synchronize
 
 jobs:
   check-commit-message:
